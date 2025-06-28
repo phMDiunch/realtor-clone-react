@@ -36,25 +36,46 @@ export default function SignIn() {
   return (
     <section>
       <h1 className="text-3xl text-center font-bold py-5">Sign In</h1>
-      <div className="flex justify-center flex-wrap items-center max-x-6xl mx-auto px-3">
-        <div className="md:[67%] ld:[50%]">
+      <div className="flex justify-center flex-wrap items-center max-w-6xl mx-auto px-3">
+        <div className="w-full md:w-2/3 lg:w-1/2">
           <img
             src="https://plus.unsplash.com/premium_photo-1663089688180-444ff0066e5d?w=700&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8a2V5fGVufDB8fDB8fHww"
             alt="key"
             className="w-full rounded-2xl"
           />
         </div>
-        <div className="w-full md:w-[67%] lg:w-[40%] lg:ml-20">
+        <div className="w-full md:w-2/3 lg:w-2/5 lg:ml-20 mt-6">
           <form onSubmit={onSubmit}>
-            <input className="w-full px-4 py-2 text-xl rounded mt-6" type="email" id="email" value={email} placeholder="Email" onChange={onChange} />
+            <input
+              className="w-full px-4 py-2 text-xl rounded mt-6"
+              type="email"
+              id="email"
+              value={email}
+              placeholder="Email"
+              onChange={onChange}
+            />
             <div className="relative mt-6">
-              <input className="w-full px-4 py-2 text-xl rounded" type={showPassword ? "text" : "password"} id="password" value={password} placeholder="Password" onChange={onChange} />
-              <button className="absolute right-3 top-1/2 -translate-y-1/2 bg-white border border-gray-300 rounded-full p-2" type="button" onClick={() => setShowPassword((prev) => !prev)}>
+              <input
+                className="w-full px-4 py-2 text-xl rounded"
+                type={showPassword ? "text" : "password"}
+                id="password"
+                value={password}
+                placeholder="Password"
+                onChange={onChange}
+              />
+              <button
+                className="absolute right-3 top-1/2 -translate-y-1/2 bg-white border border-gray-300 rounded-full p-2"
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+              >
                 {showPassword ? <FaEyeSlash /> : <FaEye />}
               </button>
             </div>
             <div>
-              <button className="w-full mt-6 bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded" type="submit">
+              <button
+                className="w-full mt-6 bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded"
+                type="submit"
+              >
                 Sign In
               </button>
             </div>
