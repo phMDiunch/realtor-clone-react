@@ -1,7 +1,11 @@
 import { useState } from "react";
-import { FaEye } from "react-icons/fa";
-import { FaEyeSlash } from "react-icons/fa";
-import { Link } from "react-router";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { Link, useNavigate } from "react-router";
+import { auth } from "../firebase";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { toast } from "react-toastify";
+import { db } from "../firebase";
+import { doc, setDoc } from "firebase/firestore";
 import OAuth from "../components/OAuth";
 
 export default function SignUp() {
@@ -11,13 +15,37 @@ export default function SignUp() {
     password: "",
   });
   const { name, email, password } = formData;
+  const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
+
   function onChange(e) {
     setFormData((prevState) => ({
       ...prevState,
       [e.target.id]: e.target.value,
     }));
   }
-  const [showPassword, setShowPassword] = useState(false);
+
+  async function onSubmit(e) {
+    e.preventDefault();
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      console.log(userCredential);
+      await updateProfile(userCredential.user, { displayName: name });
+      // Lưu thông tin vào Firestore
+      await setDoc(doc(db, "users", userCredential.user.uid), {
+        name,
+        email,
+        timestamp: new Date(),
+      });
+      // Hiển thị thông báo thành công
+      toast.success("Đăng ký thành công!");
+      // Chuyển hướng đến trang chính
+      navigate("/");
+    } catch (error) {
+      toast.error("Đăng ký thất bại: " + error.message);
+    }
+  }
+
   return (
     <section>
       <h1 className="text-3xl text-center font-bold py-5">Sign Up</h1>
@@ -30,14 +58,14 @@ export default function SignUp() {
           />
         </div>
         <div className="w-full md:w-[67%] lg:w-[40%] lg:ml-20 mt-6">
-          <form>
+          <form onSubmit={onSubmit}>
             <input
               className="w-full px-4 py-2 text-xl rounded mt-6"
               type="text"
               id="name"
               value={name}
               placeholder="Name"
-              onChange={(e) => onChange(e)}
+              onChange={onChange}
             />
             <input
               className="w-full px-4 py-2 text-xl rounded mt-6"
@@ -45,7 +73,7 @@ export default function SignUp() {
               id="email"
               value={email}
               placeholder="Email"
-              onChange={(e) => onChange(e)}
+              onChange={onChange}
             />
             <div className="relative mt-6">
               <input
@@ -54,7 +82,7 @@ export default function SignUp() {
                 id="password"
                 value={password}
                 placeholder="Password"
-                onChange={(e) => onChange(e)}
+                onChange={onChange}
               />
               <button
                 className="absolute right-3 top-1/2 -translate-y-1/2 bg-white border border-gray-300 rounded-full p-2"
@@ -90,9 +118,8 @@ export default function SignUp() {
               </Link>
             </p>
           </div>
-
+          <OAuth />
         </div>
-        <OAuth />
       </div>
     </section>
   );

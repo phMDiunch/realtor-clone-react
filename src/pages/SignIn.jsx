@@ -29,38 +29,17 @@ export default function SignIn() {
             className="w-full rounded-2xl"
           />
         </div>
-        <div className="w-full md:w-[67%] lg:w-[40%] lg:ml-20 mt-6">
+        <div className="w-full md:w-[67%] lg:w-[40%] lg:ml-20">
           <form>
-            <input
-              className="w-full px-4 py-2 text-xl rounded"
-              type="email"
-              id="email"
-              value={email}
-              placeholder="Email"
-              onChange={(e) => onChange(e)}
-            />
+            <input className="w-full px-4 py-2 text-xl rounded mt-6" type="email" id="email" value={email} placeholder="Email" onChange={(e) => onChange(e)} />
             <div className="relative mt-6">
-              <input
-                className="w-full px-4 py-2 text-xl rounded"
-                type={showPassword ? "text" : "password"}
-                id="password"
-                value={password}
-                placeholder="Password"
-                onChange={(e) => onChange(e)}
-              />
-              <button
-                className="absolute right-3 top-1/2 -translate-y-1/2 bg-white border border-gray-300 rounded-full p-2"
-                type="button"
-                onClick={() => setShowPassword((prev) => !prev)}
-              >
+              <input className="w-full px-4 py-2 text-xl rounded" type={showPassword ? "text" : "password"} id="password" value={password} placeholder="Password" onChange={(e) => onChange(e)} />
+              <button className="absolute right-3 top-1/2 -translate-y-1/2 bg-white border border-gray-300 rounded-full p-2" type="button" onClick={() => setShowPassword((prev) => !prev)}>
                 {showPassword ? <FaEyeSlash /> : <FaEye />}
               </button>
             </div>
             <div>
-              <button
-                className="w-full mt-6 bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded"
-                type="submit"
-              >
+              <button className="w-full mt-6 bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded" type="submit"  >
                 Sign In
               </button>
             </div>
@@ -82,9 +61,9 @@ export default function SignIn() {
               </Link>
             </p>
           </div>
-
+          <OAuth />
         </div>
-        <OAuth />
+
       </div>
     </section>
   );

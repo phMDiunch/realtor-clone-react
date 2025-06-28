@@ -58,9 +58,9 @@ export default function ForgotPassword() {
               </Link>
             </p>
           </div>
-
+          <OAuth />
         </div>
-        <OAuth />
+
       </div>
     </section>
   );
