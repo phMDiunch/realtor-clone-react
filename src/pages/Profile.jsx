@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { auth } from "../firebase";
 import { updateProfile, updateEmail } from "firebase/auth";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 export default function Profile() {
   const user = auth.currentUser;
@@ -32,13 +33,15 @@ export default function Profile() {
       if (user.displayName !== formData.name) {
         await updateProfile(user, { displayName: formData.name });
       }
-      if (user.email !== formData.email) {
-        await updateEmail(user, formData.email);
-      }
       toast.success("Cập nhật thông tin thành công!");
     } catch (error) {
       toast.error("Cập nhật thất bại: " + error.message);
     }
+  }
+  const navigate = useNavigate();
+  function signOut() {
+    auth.signOut();
+    navigate("/signin");
   }
 
   return (
@@ -75,7 +78,7 @@ export default function Profile() {
         </div>
         <div className="flex justify-between items-center mb-6">
           <p>Do you want to change your name? <span className="text-red-500 cursor-pointer">Edit</span></p>
-          <p className="text-blue-500 cursor-pointer">Sign out</p>
+          <p className="text-blue-500 cursor-pointer" onClick={signOut}>Sign out</p>
         </div>
         <button
           type="submit"
