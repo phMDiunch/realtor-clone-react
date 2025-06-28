@@ -1,8 +1,10 @@
 import { useLocation, Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../components/AuthContext";
 
 export default function Header() {
     const location = useLocation();
     const navigate = useNavigate();
+    const { user } = useAuth();
 
     return (
         <div className="bg-white border-b shadow-sm sticky top-0 z-50">
@@ -29,13 +31,19 @@ export default function Header() {
                             {" "}
                             <Link to="/offers">Offers</Link>
                         </li>
-                        <li
-                            className={` hover:text-red-600 ${location.pathname === "/signin" && "border-b-2 border-red-600"
-                                }`}
-                        >
-                            {" "}
-                            <Link to="/signin">Sign In</Link>
-                        </li>
+                        {user ? (
+                            <li
+                                className={`hover:text-red-600 ${location.pathname === "/profile" && "border-b-2 border-red-600"}`}
+                            >
+                                <Link to="/profile">Profile</Link>
+                            </li>
+                        ) : (
+                            <li
+                                className={`hover:text-red-600 ${location.pathname === "/signin" && "border-b-2 border-red-600"}`}
+                            >
+                                <Link to="/signin">Sign In</Link>
+                            </li>
+                        )}
                     </ul>
                 </div>
             </header>

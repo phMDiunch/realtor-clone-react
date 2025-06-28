@@ -9,10 +9,11 @@ import ForgotPassword from "./pages/ForgotPassword";
 import Offers from "./pages/Offers";
 import Profile from "./pages/Profile";
 import PrivateRoute from "./components/PrivateRoute";
+import { AuthProvider } from "./components/AuthContext";
 
 function App() {
   return (
-    <>
+    <AuthProvider>
       <Router>
         <Header />
         <Routes>
@@ -33,7 +34,7 @@ function App() {
         </Routes>
         <ToastContainer />
       </Router>
-    </>
+    </AuthProvider>
   );
 }
 
