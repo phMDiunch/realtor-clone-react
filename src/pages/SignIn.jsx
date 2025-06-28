@@ -1,8 +1,10 @@
 import { useState } from "react";
-import { FaEye } from "react-icons/fa";
-import { FaEyeSlash } from "react-icons/fa";
-import { Link } from "react-router";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { Link, useNavigate } from "react-router-dom";
 import OAuth from "../components/OAuth";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../firebase";
+import { toast } from "react-toastify";
 
 export default function SignIn() {
   const [formData, setFormData] = useState({
@@ -10,14 +12,27 @@ export default function SignIn() {
     password: "",
   });
   const { email, password } = formData;
+  const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
+
   function onChange(e) {
     setFormData((prevState) => ({
       ...prevState,
       [e.target.id]: e.target.value,
     }));
-    console.log(formData);
   }
-  const [showPassword, setShowPassword] = useState(false);
+
+  async function onSubmit(e) {
+    e.preventDefault();
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      toast("Xin chao " + userCredential.user.displayName);
+      navigate("/");
+    } catch (error) {
+      toast.error("Đăng nhập thất bại: " + error.message);
+    }
+  }
+
   return (
     <section>
       <h1 className="text-3xl text-center font-bold py-5">Sign In</h1>
@@ -30,16 +45,16 @@ export default function SignIn() {
           />
         </div>
         <div className="w-full md:w-[67%] lg:w-[40%] lg:ml-20">
-          <form>
-            <input className="w-full px-4 py-2 text-xl rounded mt-6" type="email" id="email" value={email} placeholder="Email" onChange={(e) => onChange(e)} />
+          <form onSubmit={onSubmit}>
+            <input className="w-full px-4 py-2 text-xl rounded mt-6" type="email" id="email" value={email} placeholder="Email" onChange={onChange} />
             <div className="relative mt-6">
-              <input className="w-full px-4 py-2 text-xl rounded" type={showPassword ? "text" : "password"} id="password" value={password} placeholder="Password" onChange={(e) => onChange(e)} />
+              <input className="w-full px-4 py-2 text-xl rounded" type={showPassword ? "text" : "password"} id="password" value={password} placeholder="Password" onChange={onChange} />
               <button className="absolute right-3 top-1/2 -translate-y-1/2 bg-white border border-gray-300 rounded-full p-2" type="button" onClick={() => setShowPassword((prev) => !prev)}>
                 {showPassword ? <FaEyeSlash /> : <FaEye />}
               </button>
             </div>
             <div>
-              <button className="w-full mt-6 bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded" type="submit"  >
+              <button className="w-full mt-6 bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded" type="submit">
                 Sign In
               </button>
             </div>
@@ -63,7 +78,6 @@ export default function SignIn() {
           </div>
           <OAuth />
         </div>
-
       </div>
     </section>
   );
