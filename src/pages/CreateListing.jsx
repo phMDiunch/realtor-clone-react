@@ -1,4 +1,8 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import { db } from "../firebase";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 export default function CreateListing() {
     const [formData, setFormData] = useState({
@@ -13,13 +17,12 @@ export default function CreateListing() {
         offer: true,
         regularPrice: "100000000",
         discount: "10000000",
-        images: [],
     });
     const [displayPrice, setDisplayPrice] = useState("");
     const [displayDiscount, setDisplayDiscount] = useState("");
 
     function onChange(e) {
-        let { id, value, files, type } = e.target;
+        let { id, value, type } = e.target;
         if (id === "sell" || id === "rent") {
             setFormData((prev) => ({
                 ...prev,
@@ -30,22 +33,7 @@ export default function CreateListing() {
                 ...prev,
                 [id]: value === "yes",
             }));
-        } else if (id === "images") {
-            // Chỉ nhận file jpg, jpeg, png và tối đa 6 file
-            const validFiles = Array.from(files).filter(
-                (file) =>
-                    ["image/jpeg", "image/png", "image/jpg"].includes(file.type)
-            );
-            if (validFiles.length > 6) {
-                alert("Chỉ được chọn tối đa 6 hình!");
-                return;
-            }
-            setFormData((prev) => ({
-                ...prev,
-                images: validFiles,
-            }));
         } else if (id === "regularPrice") {
-            // Chỉ nhận số, loại bỏ ký tự không phải số
             const raw = value.replace(/\D/g, "");
             setFormData((prev) => ({
                 ...prev,
@@ -65,13 +53,26 @@ export default function CreateListing() {
                 [id]: type === "number" ? Number(value) : value,
             }));
         }
-        console.log("Form data updated:", formData);
     }
-
-    function onSubmit(e) {
+    const navigate = useNavigate();
+    async function onSubmit(e) {
         e.preventDefault();
-        // Xử lý lưu dữ liệu ở đây
-        alert("Đã gửi thông tin (demo)");
+
+        try {
+            const listingData = {
+                ...formData,
+                regularPrice: Number(formData.regularPrice),
+                discount: Number(formData.discount),
+                timestamp: serverTimestamp(),
+            };
+
+            const docRef = await addDoc(collection(db, "listings"), listingData);
+
+            toast.success("Tạo listing thành công!");
+            // navigate(`/listing/${docRef.id}`);
+        } catch (error) {
+            toast.error("Có lỗi khi tạo listing: " + error.message);
+        }
     }
 
     return (
@@ -294,26 +295,6 @@ export default function CreateListing() {
                         </div>
                     </div>
                 )}
-                {/* Images */}
-                <div className="mb-6">
-                    <label className="block mb-1 font-medium" htmlFor="images">
-                        Hình ảnh (tối đa 6, jpg/jpeg/png)
-                    </label>
-                    <input
-                        className="w-full"
-                        type="file"
-                        id="images"
-                        accept=".jpg,.jpeg,.png"
-                        multiple
-                        onChange={onChange}
-
-                    />
-                    {formData.images.length > 0 && (
-                        <div className="mt-2 text-sm text-gray-600">
-                            Đã chọn {formData.images.length} hình
-                        </div>
-                    )}
-                </div>
                 <button
                     type="submit"
                     className="w-full bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded"
