@@ -10,6 +10,7 @@ import Offers from "./pages/Offers";
 import Profile from "./pages/Profile";
 import PrivateRoute from "./components/PrivateRoute";
 import { AuthProvider } from "./components/AuthContext";
+import CreateListing from "./pages/CreateListing";
 
 function App() {
   return (
@@ -27,6 +28,14 @@ function App() {
             element={
               <PrivateRoute>
                 <Profile />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/create-listing"
+            element={
+              <PrivateRoute>
+                <CreateListing />
               </PrivateRoute>
             }
           />

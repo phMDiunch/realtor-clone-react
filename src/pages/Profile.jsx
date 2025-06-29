@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { auth } from "../firebase";
-import { updateProfile, updateEmail } from "firebase/auth";
+import { updateProfile } from "firebase/auth";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
@@ -10,6 +10,9 @@ export default function Profile() {
     name: user.displayName || "",
     email: user.email || "",
   });
+  const [editing, setEditing] = useState(false);
+  const navigate = useNavigate();
+  const nameInputRef = useRef(null);
 
   useEffect(() => {
     if (user) {
@@ -20,6 +23,13 @@ export default function Profile() {
     }
   }, [user]);
 
+  // Focus vào input khi chuyển sang edit
+  useEffect(() => {
+    if (editing && nameInputRef.current) {
+      nameInputRef.current.focus();
+    }
+  }, [editing]);
+
   function onChange(e) {
     setFormData((prev) => ({
       ...prev,
@@ -27,18 +37,26 @@ export default function Profile() {
     }));
   }
 
-  async function onSubmit(e) {
-    e.preventDefault();
+  async function handleSave() {
     try {
       if (user.displayName !== formData.name) {
         await updateProfile(user, { displayName: formData.name });
+        toast.success("Cập nhật thông tin thành công!");
       }
-      toast.success("Cập nhật thông tin thành công!");
+      setEditing(false);
     } catch (error) {
       toast.error("Cập nhật thất bại: " + error.message);
     }
   }
-  const navigate = useNavigate();
+
+  function handleCancel() {
+    setFormData((prev) => ({
+      ...prev,
+      name: user.displayName || "",
+    }));
+    setEditing(false);
+  }
+
   function signOut() {
     auth.signOut();
     navigate("/signin");
@@ -49,18 +67,20 @@ export default function Profile() {
       <h1 className="text-2xl font-bold mb-6 text-center">
         My Profile
       </h1>
-      <form onSubmit={onSubmit}>
+      <form onSubmit={e => e.preventDefault()}>
         <div className="mb-4">
           <label htmlFor="name" className="block mb-1 font-medium">
             Tên
           </label>
           <input
-            className="w-full px-4 py-2 border rounded"
+            ref={nameInputRef}
+            className={`w-full px-4 py-2 border rounded }`}
             type="text"
             id="name"
             value={formData.name}
             onChange={onChange}
             required
+            disabled={!editing}
           />
         </div>
         <div className="mb-4">
@@ -72,21 +92,49 @@ export default function Profile() {
             type="email"
             id="email"
             value={formData.email}
-            disabled
-
+            disabled={true} // Email is not editable
           />
         </div>
         <div className="flex justify-between items-center mb-6">
-          <p>Do you want to change your name? <span className="text-red-500 cursor-pointer">Edit</span></p>
-          <p className="text-blue-500 cursor-pointer" onClick={signOut}>Sign out</p>
+          <p>
+            Thay đổi tên?{" "}
+            {editing ? (
+              <>
+                <span
+                  className="text-green-600 cursor-pointer font-semibold mr-4"
+                  onClick={handleSave}
+                >
+                  Save
+                </span>
+                <span
+                  className="text-gray-500 cursor-pointer font-semibold"
+                  onClick={handleCancel}
+                >
+                  Cancel
+                </span>
+              </>
+            ) : (
+              <span
+                className="text-red-500 cursor-pointer"
+                onClick={() => setEditing(true)}
+              >
+                Edit
+              </span>
+            )}
+          </p>
+          <p className="text-blue-500 cursor-pointer" onClick={signOut}>
+            Sign out
+          </p>
         </div>
-        <button
-          type="submit"
-          className="w-full bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded"
-        >
-          Lưu thay đổi
-        </button>
       </form>
+      <div className="mt-6">
+        <button
+          className="w-full bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded"
+          onClick={() => navigate("/create-listing")}
+        >
+          Tạo thông tin nhà cho thuê/bán
+        </button>
+      </div>
     </section>
   );
 }
